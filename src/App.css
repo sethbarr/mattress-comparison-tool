@@ -40,3 +40,166 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Base container styles */
+.comparison-container {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styles */
+.comparison-header {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+}
+
+/* Table styles */
+.mattress-table {
+  background-color: #ffffff;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mattress-table th {
+  background-color: #f7fafc;
+  color: #4a5568;
+  font-weight: 600;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.mattress-table td {
+  padding: 1rem;
+  color: #2d3748;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mattress-table tr:hover {
+  background-color: #f7fafc;
+}
+
+/* Chart styles */
+.chart-container {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart title */
+.chart-title {
+  color: #2d3748;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Button styles */
+.action-button {
+  background-color: #4a5568;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: #2d3748;
+}
+
+/* Edit/Delete button styles */
+.edit-button {
+  color: #4299e1;
+  margin-right: 1rem;
+}
+
+.delete-button {
+  color: #f56565;
+}
+
+/* Chart point styles */
+.data-point {
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.data-point.firm {
+  fill: #4299e1;
+}
+
+.data-point.medium-firm {
+  fill: #48bb78;
+}
+
+.data-point.medium {
+  fill: #ecc94b;
+}
+
+.data-point.variable {
+  fill: #9f7aea;
+}
+
+/* Tooltip styles */
+.tooltip {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-title {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.tooltip-content {
+  color: #4a5568;
+  font-size: 0.875rem;
+}
+
+/* Grid lines */
+.grid-line {
+  stroke: #e2e8f0;
+  stroke-width: 1;
+}
+
+/* Axis labels */
+.axis-label {
+  fill: #4a5568;
+  font-size: 0.875rem;
+}
+
+/* Legend styles */
+.legend-container {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #f7fafc;
+  border-radius: 4px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
