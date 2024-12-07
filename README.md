@@ -2,6 +2,8 @@
 
 A user-friendly tool to compare mattresses based on various features and help make informed purchasing decisions. Compare prices, trial periods, warranties, coil counts, and more with an interactive visualization.
 
+If you like this project, please consider giving it a ⭐, sharing it with your friends, or [buy me a coffee ❤️ ☕](https://www.buymeacoffee.com/sethbarr)!
+
 ## Features ✨
 
 - Interactive scatter plot visualization of mattress prices vs. feature scores
@@ -87,12 +89,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments 🙏
 
-- Thanks to all mattress companies for providing transparent product information
-- Inspired by the need for objective mattress comparison tools
-- Built with data from real mattress specifications and user experiences
+- Thanks to all mattress companies for providing transparent product information. Sort of.
+- Inspired by the need for objective mattress comparison tools and my inability to make decisions.
+- Built with data from real mattress specifications in December 2024. This is very much subject to change.
 
 ## Contact 📧
 
-Your Name - [your-email@example.com](mailto:your-email@example.com)
+<!-- Your Name - [your-email@example.com](mailto:your-email@example.com) -->
 
 Project Link: [https://github.com/sethbarr/mattress-comparison-tool](https://github.com/sethbarr/mattress-comparison-tool)
