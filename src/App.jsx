@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Label, ResponsiveContainer, Legend } from 'recharts';
+import TestChart from './TestChart';
 
 const MattressComparisonTool = () => {
   const [mattresses, setMattresses] = useState([
@@ -194,9 +195,16 @@ const MattressComparisonTool = () => {
 
   const scoredData = calculateScores();
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+  
+  // Add useEffect to check mounting
+  useEffect(() => {
+    console.log('Component mounted');
+    console.log('Initial data:', scoredData);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white p-4">
+
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Mattress Comparison Tool</h1>
       
       {/* Weights Section */}
@@ -247,10 +255,22 @@ const MattressComparisonTool = () => {
         </table>
       </div>
 
-      {/* Scatter Plot */}
+// Add this right before the ScatterChart render
+console.log('Scored Data:', scoredData);
+console.log('Chart dimensions:', document.querySelector('.chart-container')?.getBoundingClientRect());
+
+console.log('Rendering chart with data:', scoredData);
+
+      {/* Test Chart */}
+      <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Test Chart</h2>
+        <TestChart />
+      </div>
+
+      {/* Original Chart */}
       <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Price vs Feature Score Comparison</h2>
-        <div className="w-full h-[600px] bg-white">
+        <div className="w-full bg-white" style={{ height: '600px', border: '1px solid blue' }}>
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart
               margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
@@ -261,69 +281,34 @@ const MattressComparisonTool = () => {
                 dataKey="score" 
                 domain={[0, 100]}
                 name="Score"
-                stroke="#374151"
               >
-                <Label 
-                  value="Feature Score" 
-                  position="bottom" 
-                  offset={0}
-                  style={{ fill: '#374151' }}
-                />
+                <Label value="Feature Score" position="bottom" />
               </XAxis>
               <YAxis 
                 type="number" 
                 dataKey="price" 
-                domain={['dataMin - 100', 'dataMax + 100']}
                 name="Price"
-                stroke="#374151"
               >
-                <Label 
-                  value="Price ($)" 
-                  angle={-90} 
-                  position="left" 
-                  offset={0}
-                  style={{ fill: '#374151' }}
-                />
+                <Label value="Price ($)" angle={-90} position="left" />
               </YAxis>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'white',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  padding: '10px'
-                }}
-              />
+              <Tooltip />
               <Legend />
-              {Object.entries(colors).map(([firmness, color]) => (
-                <Scatter
-                  key={firmness}
-                  name={firmness}
-                  data={scoredData.filter(d => d.firmness === firmness)}
-                  fill={color}
-                />
-              ))}
-              {/* Add labels for each point */}
-              {scoredData.map((item) => (
-                <g key={`label-${item.id}`}>
-                  <text
-                    x={item.score}
-                    y={item.price}
-                    dx={5}
-                    dy={-5}
-                    fontSize={12}
-                    fill="#374151"
-                  >
-                    {item.name}
-                  </text>
-                </g>
-              ))}
+              {Object.entries(colors).map(([firmness, color]) => {
+                const filteredData = scoredData.filter(d => d.firmness === firmness);
+                console.log(`Data for ${firmness}:`, filteredData);
+                return (
+                  <Scatter
+                    key={firmness}
+                    name={firmness}
+                    data={filteredData}
+                    fill={color}
+                  />
+                );
+              })}
             </ScatterChart>
           </ResponsiveContainer>
         </div>
       </div>
-
-      {/* Add New Mattress Form - Hidden for now */}
-      {/* You can add a button to toggle this section if needed */}
     </div>
   );
 };
