@@ -236,3 +236,44 @@
 .read-the-docs {
   color: var(--text-secondary);
 }
+
+.recharts-wrapper {
+  background-color: white !important;
+}
+
+.recharts-surface {
+  background-color: white !important;
+}
+
+.recharts-default-tooltip {
+  background-color: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 4px;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: #1f2937 !important;
+  /* Dark text for axis labels */
+}
+
+.recharts-legend-item-text {
+  color: #1f2937 !important;
+  /* Dark text for legend */
+}
+
+.recharts-text {
+  fill: #1f2937 !important;
+  /* Dark text for all chart text */
+}
+
+/* Ensure chart container has white background */
+.chart-container {
+  background-color: white !important;
+}
+
+/* Update grid lines to be more visible on white background */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #e2e8f0 !important;
+  stroke-width: 1;
+}

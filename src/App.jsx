@@ -538,70 +538,85 @@ const handleEditSubmit = (e) => {
 
 <div className="mb-8 p-6 bg-white rounded-lg shadow">
   <h2 className="text-2xl font-bold text-gray-900 mb-4">Price vs Feature Score Comparison</h2>
-  <div className="w-full bg-white" style={{ height: '600px' }}>
+  <div className="w-full bg-white" style={{ height: '600px', backgroundColor: 'white' }}>
     <ResponsiveContainer width="100%" height="100%">
-  <ScatterChart
-    margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
-  >
-    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-    <XAxis 
-      type="number" 
-      dataKey="score" 
-      domain={[0, 100]}
-      name="Score"
-      tick={{ fill: '#1f2937' }}
-      stroke="#94a3b8"
-    >
-      <Label 
-        value="Feature Score" 
-        position="bottom" 
-        offset={20}
-        style={{ fill: '#1f2937', fontSize: 14 }}
-      />
-    </XAxis>
-    <YAxis 
-      type="number" 
-      dataKey="price" 
-      domain={['dataMin - 100', 'dataMax + 100']}
-      name="Price"
-      tick={{ fill: '#1f2937' }}
-      stroke="#94a3b8"
-    >
-      <Label 
-        value="Price ($)" 
-        angle={-90} 
-        position="left" 
-        offset={20}
-        style={{ fill: '#1f2937', fontSize: 14 }}
-      />
-    </YAxis>
-    <Tooltip 
-      content={<CustomTooltip />}
-      cursor={{ strokeDasharray: '3 3' }}
-      wrapperStyle={{ zIndex: 100 }}
-      position={{ y: 0 }}
-    />
-    <Legend 
-      verticalAlign="top"
-      height={36}
-      wrapperStyle={{
-        paddingBottom: '20px',
-        color: '#1f2937'
-      }}
-    />
-    {Object.entries(colors).map(([firmness, color]) => (
-      <Scatter
-        key={firmness}
-        name={firmness}
-        data={scoredData.filter(d => d.firmness === firmness)}
-        fill={color}
-        stroke="#ffffff"
-        strokeWidth={2}
-        r={8}
-      />
-    ))}
-  </ScatterChart>
-</ResponsiveContainer>
+      <ScatterChart
+        margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
+        style={{ backgroundColor: 'white' }}
+      >
+        <CartesianGrid 
+          strokeDasharray="3 3" 
+          stroke="#e2e8f0"
+          vertical={true}
+          horizontal={true}
+        />
+        <XAxis 
+          type="number" 
+          dataKey="score" 
+          domain={[0, 100]}
+          name="Score"
+          tick={{ fill: '#1f2937' }}  // Dark text for visibility
+          stroke="#94a3b8"  // Lighter line color
+        >
+          <Label 
+            value="Feature Score" 
+            position="bottom" 
+            offset={20}
+            style={{ 
+              fill: '#1f2937',  // Dark text
+              fontSize: 14,
+              fontWeight: 500
+            }}
+          />
+        </XAxis>
+        <YAxis 
+          type="number" 
+          dataKey="price" 
+          domain={['dataMin - 100', 'dataMax + 100']}
+          name="Price"
+          tick={{ fill: '#1f2937' }}  // Dark text for visibility
+          stroke="#94a3b8"  // Lighter line color
+        >
+          <Label 
+            value="Price ($)" 
+            angle={-90} 
+            position="left" 
+            offset={20}
+            style={{ 
+              fill: '#1f2937',  // Dark text
+              fontSize: 14,
+              fontWeight: 500
+            }}
+          />
+        </YAxis>
+        <Tooltip 
+          content={<CustomTooltip />}
+          cursor={{ strokeDasharray: '3 3' }}
+          wrapperStyle={{ zIndex: 100 }}
+        />
+        <Legend 
+          verticalAlign="top"
+          height={36}
+          wrapperStyle={{
+            paddingBottom: '20px',
+            fontSize: '14px',
+            color: '#1f2937',  // Dark text for visibility
+            backgroundColor: 'white'  // White background
+          }}
+        />
+        {Object.entries(colors).map(([firmness, color]) => (
+          <Scatter
+            key={firmness}
+            name={firmness}
+            data={scoredData.filter(d => d.firmness === firmness)}
+            fill={color}
+            stroke="#ffffff"
+            strokeWidth={2}
+            r={8}
+          />
+        ))}
+      </ScatterChart>
+    </ResponsiveContainer>
   </div>
 </div>
 </div>
