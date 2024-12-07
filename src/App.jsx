@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-const [mattresses, setMattresses] = useState([
+const MattressComparisonTool = () => {
+  const [mattresses, setMattresses] = useState([
     { 
       id: 1,
       name: 'Happsy', 
@@ -81,8 +82,8 @@ const [mattresses, setMattresses] = useState([
       coils: 1280,
       lumbar: false,
       returnCosts: 0,
-      shippingCosts: 99,  // "0 OR 99" , using worst case
-      firmness: 'Variable'  // "Medium or Medium-firm" 
+      shippingCosts: 99,
+      firmness: 'Variable'
     },
     { 
       id: 7,
@@ -104,13 +105,13 @@ const [mattresses, setMattresses] = useState([
       fullPrice: 3599,
       trial: 100,
       warranty: 50,
-      coils: 0,  // No coil data in original matrix
+      coils: 0,
       lumbar: false,
       returnCosts: 0,
-      shippingCosts: 149,  // "0 or 149" , using worst case
-      firmness: 'Variable'  // "Medium or Medium-firm" 
+      shippingCosts: 149,
+      firmness: 'Variable'
     }
-]);
+  ]);
 
   const [weights, setWeights] = useState({
     trial: 25,
@@ -236,202 +237,18 @@ const [mattresses, setMattresses] = useState([
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle>Scoring Weights (Total: {totalWeight}%)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {Object.entries(weights).map(([key, value]) => (
-              <div key={key} className="space-y-2">
-                <label className="text-sm font-medium">
-                  {key.charAt(0).toUpperCase() + key.slice(1)} Weight (%)
-                </label>
-                <Input
-                  type="number"
-                  value={value}
-                  onChange={(e) => handleWeightChange(key, e.target.value)}
-                  min="0"
-                  max="100"
-                />
-              </div>
-            ))}
-          </div>
-          {totalWeight !== 100 && (
-            <Alert className="mt-4">
-              <AlertDescription>
-                Warning: Weights should sum to 100%. Current total: {totalWeight}%
-              </AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Add New Mattress</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium">Name</label>
-              <Input
-                value={newMattress.name}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Mattress Name"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Price ($)</label>
-              <Input
-                type="number"
-                value={newMattress.price}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, price: e.target.value }))}
-                placeholder="Price"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Trial Period (days)</label>
-              <Input
-                type="number"
-                value={newMattress.trial}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, trial: e.target.value }))}
-                placeholder="Trial Period"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Warranty (years)</label>
-              <Input
-                type="number"
-                value={newMattress.warranty}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, warranty: e.target.value }))}
-                placeholder="Warranty"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Coil Count</label>
-              <Input
-                type="number"
-                value={newMattress.coils}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, coils: e.target.value }))}
-                placeholder="Coil Count"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Return Costs ($)</label>
-              <Input
-                type="number"
-                value={newMattress.returnCosts}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, returnCosts: e.target.value }))}
-                placeholder="Return Costs"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Shipping Costs ($)</label>
-              <Input
-                type="number"
-                value={newMattress.shippingCosts}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, shippingCosts: e.target.value }))}
-                placeholder="Shipping Costs"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Firmness</label>
-              <select
-                className="w-full p-2 border rounded"
-                value={newMattress.firmness}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, firmness: e.target.value }))}
-              >
-                {firmnessOptions.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Lumbar Support</label>
-              <input
-                type="checkbox"
-                checked={newMattress.lumbar}
-                onChange={(e) => setNewMattress(prev => ({ ...prev, lumbar: e.target.checked }))}
-                className="ml-2"
-              />
-            </div>
-          </div>
-          <Button className="mt-4" onClick={handleAddMattress}>Add Mattress</Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Mattresses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2">Name</th>
-                  <th className="text-right p-2">Price</th>
-                  <th className="text-right p-2">Score</th>
-                  <th className="text-center p-2">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {scoredData.sort((a, b) => b.score - a.score).map((item) => (
-                  <tr key={item.id} className="border-b">
-                    <td className="p-2">{item.name}</td>
-                    <td className="text-right p-2">${item.price.toLocaleString()}</td>
-                    <td className="text-right p-2">{item.score.toFixed(1)}</td>
-                    <td className="text-center p-2">
-                      <Button 
-                        variant="destructive" 
-                        size="sm"
-                        onClick={() => handleDeleteMattress(item.id)}
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Price vs Feature Score Comparison</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart
-                margin={{ top: 20, right: 120, bottom: 60, left: 60 }}
-              >
+              <ScatterChart margin={{ top: 20, right: 120, bottom: 60, left: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  type="number" 
-                  dataKey="score" 
-                  domain={[0, 100]}
-                  name="Score"
-                >
-                  <Label 
-                    value="Feature Score" 
-                    position="bottom" 
-                    offset={0}
-                  />
+                <XAxis type="number" dataKey="score" domain={[0, 100]} name="Score">
+                  <Label value="Feature Score" position="bottom" offset={0} />
                 </XAxis>
-                <YAxis 
-                  type="number" 
-                  dataKey="price" 
-                  domain={['dataMin - 100', 'dataMax + 100']}
-                  name="Price"
-                >
-                  <Label 
-                    value="Price ($)" 
-                    angle={-90} 
-                    position="left" 
-                    offset={0}
-                  />
+                <YAxis type="number" dataKey="price" domain={['dataMin - 100', 'dataMax + 100']} name="Price">
+                  <Label value="Price ($)" angle={-90} position="left" offset={0} />
                 </YAxis>
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
@@ -463,5 +280,6 @@ const [mattresses, setMattresses] = useState([
       </Card>
     </div>
   );
+};
 
 export default MattressComparisonTool;
