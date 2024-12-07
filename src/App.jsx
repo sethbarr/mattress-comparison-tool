@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Label, ResponsiveContainer, Legend } from 'recharts';
-import TestChart from './TestChart';
 
 const MattressComparisonTool = () => {
   const [mattresses, setMattresses] = useState([
@@ -15,7 +14,7 @@ const MattressComparisonTool = () => {
       lumbar: false,
       returnCosts: 0,
       shippingCosts: 0,
-      firmness: 'Variable'  // "Medium firm or Plush" 
+      firmness: 'Variable'
     },
     { 
       id: 2,
@@ -110,7 +109,8 @@ const MattressComparisonTool = () => {
     }
   ]);
 
-// Form state for new mattress
+  const [showAddForm, setShowAddForm] = useState(false);
+  
   const [newMattress, setNewMattress] = useState({
     name: '',
     price: '',
@@ -123,7 +123,6 @@ const MattressComparisonTool = () => {
     firmness: 'Medium'
   });
 
-  // Weights state
   const [weights, setWeights] = useState({
     trial: 25,
     warranty: 25,
@@ -132,7 +131,6 @@ const MattressComparisonTool = () => {
     returnShipping: 10
   });
 
-  const firmnessOptions = ['Firm', 'Medium-Firm', 'Medium', 'Variable'];
   const colors = {
     'Firm': '#2563eb',
     'Medium-Firm': '#4f46e5',
@@ -140,37 +138,6 @@ const MattressComparisonTool = () => {
     'Variable': '#6b7280'
   };
 
-  // Handle adding new mattress
-  const handleAddMattress = (e) => {
-    e.preventDefault();
-    if (!newMattress.name) return;
-
-    setMattresses(prev => [...prev, {
-      ...newMattress,
-      id: Math.max(0, ...prev.map(m => m.id)) + 1,
-      price: parseFloat(newMattress.price) || 0,
-      trial: parseInt(newMattress.trial) || 0,
-      warranty: parseInt(newMattress.warranty) || 0,
-      coils: parseInt(newMattress.coils) || 0,
-      returnCosts: parseFloat(newMattress.returnCosts) || 0,
-      shippingCosts: parseFloat(newMattress.shippingCosts) || 0
-    }]);
-
-    // Reset form
-    setNewMattress({
-      name: '',
-      price: '',
-      trial: '',
-      warranty: '',
-      coils: '',
-      lumbar: false,
-      returnCosts: '',
-      shippingCosts: '',
-      firmness: 'Medium'
-    });
-  };
-
-  // Calculate scores
   const calculateScores = () => {
     const maxTrial = Math.max(...mattresses.map(d => d.trial));
     const maxWarranty = Math.max(...mattresses.map(d => d.warranty));
@@ -193,27 +160,71 @@ const MattressComparisonTool = () => {
     });
   };
 
+  const handleAddMattress = (e) => {
+    e.preventDefault();
+    const mattressToAdd = {
+      id: Math.max(...mattresses.map(m => m.id)) + 1,
+      name: newMattress.name,
+      price: parseFloat(newMattress.price) || 0,
+      fullPrice: parseFloat(newMattress.price) || 0, // Assuming initial price is full price
+      trial: parseInt(newMattress.trial) || 0,
+      warranty: parseInt(newMattress.warranty) || 0,
+      coils: parseInt(newMattress.coils) || 0,
+      lumbar: newMattress.lumbar,
+      returnCosts: parseFloat(newMattress.returnCosts) || 0,
+      shippingCosts: parseFloat(newMattress.shippingCosts) || 0,
+      firmness: newMattress.firmness
+    };
+
+    setMattresses([...mattresses, mattressToAdd]);
+    setNewMattress({
+      name: '',
+      price: '',
+      trial: '',
+      warranty: '',
+      coils: '',
+      lumbar: false,
+      returnCosts: '',
+      shippingCosts: '',
+      firmness: 'Medium'
+    });
+    setShowAddForm(false);
+  };
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-4 border rounded shadow">
+          <p className="font-bold mb-2">{data.name}</p>
+          <p>Price: ${data.price.toLocaleString()}</p>
+          <p>Score: {data.score.toFixed(1)}</p>
+          <p>Firmness: {data.firmness}</p>
+          <div className="mt-2 text-sm">
+            <p>Trial: {data.trial} days</p>
+            <p>Warranty: {data.warranty} years</p>
+            <p>Coils: {data.coils}</p>
+            <p>Lumbar Support: {data.lumbar ? 'Yes' : 'No'}</p>
+            <p>Return Cost: ${data.returnCosts}</p>
+            <p>Shipping Cost: ${data.shippingCosts}</p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   const scoredData = calculateScores();
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
-  
-  // Add useEffect to check mounting
-  useEffect(() => {
-    console.log('Component mounted');
-    console.log('Initial data:', scoredData);
-  }, []);
 
   return (
     <div className="min-h-screen bg-white p-4">
-
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Mattress Comparison Tool</h1>
-      
-      {/* Weights Section */}
       <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Scoring Weights (Total: {totalWeight}%)</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.entries(weights).map(([key, value]) => (
             <div key={key} className="space-y-2">
-              <label className="block text-sm font-bold text-gray-700">
+              <label className="block text-sm font-medium text-gray-700">
                 {key.charAt(0).toUpperCase() + key.slice(1)} Weight (%)
               </label>
               <input
@@ -223,15 +234,128 @@ const MattressComparisonTool = () => {
                   ...prev,
                   [key]: Math.max(0, Math.min(100, parseInt(e.target.value) || 0))
                 }))}
-                className="w-full p-2 border rounded bg-white text-gray-900"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Comparison Table */}
-      <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow overflow-x-auto">
+      <div className="mb-8">
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          {showAddForm ? 'Cancel' : 'Add New Mattress'}
+        </button>
+      </div>
+
+      {showAddForm && (
+        <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Add New Mattress</h2>
+          <form onSubmit={handleAddMattress} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                value={newMattress.name}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, name: e.target.value }))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Price ($)</label>
+              <input
+                type="number"
+                value={newMattress.price}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, price: e.target.value }))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Trial Period (days)</label>
+              <input
+                type="number"
+                value={newMattress.trial}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, trial: e.target.value }))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Warranty (years)</label>
+              <input
+                type="number"
+                value={newMattress.warranty}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, warranty: e.target.value }))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Coil Count</label>
+              <input
+                type="number"
+                value={newMattress.coils}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, coils: e.target.value }))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Firmness</label>
+              <select
+                value={newMattress.firmness}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, firmness: e.target.value }))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="Firm">Firm</option>
+                <option value="Medium-Firm">Medium-Firm</option>
+                <option value="Medium">Medium</option>
+                <option value="Variable">Variable</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Return Costs ($)</label>
+              <input
+                type="number"
+                value={newMattress.returnCosts}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, returnCosts: e.target.value }))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Shipping Costs ($)</label>
+              <input
+                type="number"
+                value={newMattress.shippingCosts}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, shippingCosts: e.target.value }))}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={newMattress.lumbar}
+                onChange={(e) => setNewMattress(prev => ({ ...prev, lumbar: e.target.checked }))}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label className="ml-2 block text-sm text-gray-700">Lumbar Support</label>
+            </div>
+            <div className="col-span-2">
+              <button
+                type="submit"
+                className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Add Mattress
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+<div className="mb-8 p-6 bg-gray-50 rounded-lg shadow overflow-x-auto">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Mattress Comparison</h2>
         <table className="min-w-full">
           <thead>
@@ -255,22 +379,9 @@ const MattressComparisonTool = () => {
         </table>
       </div>
 
-// Add this right before the ScatterChart render
-console.log('Scored Data:', scoredData);
-console.log('Chart dimensions:', document.querySelector('.chart-container')?.getBoundingClientRect());
-
-console.log('Rendering chart with data:', scoredData);
-
-      {/* Test Chart */}
-      <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Test Chart</h2>
-        <TestChart />
-      </div>
-
-      {/* Original Chart */}
       <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Price vs Feature Score Comparison</h2>
-        <div className="w-full bg-white" style={{ height: '600px', border: '1px solid blue' }}>
+        <div className="w-full bg-white" style={{ height: '600px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart
               margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
@@ -281,30 +392,40 @@ console.log('Rendering chart with data:', scoredData);
                 dataKey="score" 
                 domain={[0, 100]}
                 name="Score"
+                tick={{ fill: '#374151' }}
               >
-                <Label value="Feature Score" position="bottom" />
+                <Label 
+                  value="Feature Score" 
+                  position="bottom" 
+                  offset={0}
+                  style={{ fill: '#374151' }}
+                />
               </XAxis>
               <YAxis 
                 type="number" 
                 dataKey="price" 
+                domain={['dataMin - 100', 'dataMax + 100']}
                 name="Price"
+                tick={{ fill: '#374151' }}
               >
-                <Label value="Price ($)" angle={-90} position="left" />
+                <Label 
+                  value="Price ($)" 
+                  angle={-90} 
+                  position="left" 
+                  offset={0}
+                  style={{ fill: '#374151' }}
+                />
               </YAxis>
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
-              {Object.entries(colors).map(([firmness, color]) => {
-                const filteredData = scoredData.filter(d => d.firmness === firmness);
-                console.log(`Data for ${firmness}:`, filteredData);
-                return (
-                  <Scatter
-                    key={firmness}
-                    name={firmness}
-                    data={filteredData}
-                    fill={color}
-                  />
-                );
-              })}
+              {Object.entries(colors).map(([firmness, color]) => (
+                <Scatter
+                  key={firmness}
+                  name={firmness}
+                  data={scoredData.filter(d => d.firmness === firmness)}
+                  fill={color}
+                />
+              ))}
             </ScatterChart>
           </ResponsiveContainer>
         </div>
