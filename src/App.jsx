@@ -136,10 +136,10 @@ const MattressComparisonTool = () => {
 
 
   const colors = {
-    'Firm': '#2563eb',
-    'Medium-Firm': '#4f46e5',
-    'Medium': '#7c3aed',
-    'Variable': '#6b7280'
+    'Firm': '#2563eb',         // Bright blue
+    'Medium-Firm': '#4f46e5',  // Indigo
+    'Medium': '#7c3aed',       // Purple
+    'Variable': '#6b7280'      // Gray, can be darkened for better contrast on light background
   };
 
   const calculateScores = () => {
@@ -244,8 +244,8 @@ const handleEditSubmit = (e) => {
 
 
   return (
-    <div className="min-h-screen bg-white p-4">
-      <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="mb-8 p-6 bg-white rounded-lg shadow">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Scoring Weights (Total: {totalWeight}%)</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.entries(weights).map(([key, value]) => (
@@ -536,36 +536,28 @@ const handleEditSubmit = (e) => {
   </div>
 )}
 
-<div className="mb-8 p-6 bg-white rounded-lg shadow"> {/* Changed to white background */}
+<div className="mb-8 p-6 bg-white rounded-lg shadow">
   <h2 className="text-2xl font-bold text-gray-900 mb-4">Price vs Feature Score Comparison</h2>
   <div className="w-full bg-white" style={{ height: '600px' }}>
     <ResponsiveContainer width="100%" height="100%">
       <ScatterChart
         margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
+        style={{ backgroundColor: 'white' }}
       >
-        <CartesianGrid 
-          strokeDasharray="3 3" 
-          stroke="#e2e8f0" // Lighter grid lines
-          vertical={true}
-          horizontal={true}
-        />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
         <XAxis 
           type="number" 
           dataKey="score" 
           domain={[0, 100]}
           name="Score"
-          tick={{ fill: '#1f2937' }} // Darker text for better contrast
-          stroke="#94a3b8" // Axis line color
+          tick={{ fill: '#1f2937' }}
+          stroke="#94a3b8"
         >
           <Label 
             value="Feature Score" 
             position="bottom" 
             offset={20}
-            style={{ 
-              fill: '#1f2937',
-              fontSize: 14,
-              fontWeight: 500 
-            }}
+            style={{ fill: '#1f2937', fontSize: 14 }}
           />
         </XAxis>
         <YAxis 
@@ -581,32 +573,19 @@ const handleEditSubmit = (e) => {
             angle={-90} 
             position="left" 
             offset={20}
-            style={{ 
-              fill: '#1f2937',
-              fontSize: 14,
-              fontWeight: 500 
-            }}
+            style={{ fill: '#1f2937', fontSize: 14 }}
           />
         </YAxis>
-        <Tooltip 
-          content={<CustomTooltip />}
-          cursor={{ strokeDasharray: '3 3' }}
-        />
+        <Tooltip content={<CustomTooltip />} />
         <Legend 
           verticalAlign="top"
           height={36}
           wrapperStyle={{
             paddingBottom: '20px',
-            fontSize: '14px',
-            fontWeight: 500
+            color: '#1f2937'
           }}
         />
-        {Object.entries({
-          'Firm': '#2563eb',         // Bright blue
-          'Medium-Firm': '#4f46e5',  // Indigo
-          'Medium': '#7c3aed',       // Purple
-          'Variable': '#6b7280'      // Gray
-        }).map(([firmness, color]) => (
+        {Object.entries(colors).map(([firmness, color]) => (
           <Scatter
             key={firmness}
             name={firmness}
@@ -614,14 +593,14 @@ const handleEditSubmit = (e) => {
             fill={color}
             stroke="#ffffff"
             strokeWidth={2}
-            r={8} // Larger points
+            r={8}
           />
         ))}
       </ScatterChart>
     </ResponsiveContainer>
   </div>
 </div>
-    </div>
+</div>
   );
 };
 
