@@ -131,6 +131,10 @@ const MattressComparisonTool = () => {
     returnShipping: 10
   });
 
+  const [editingMattress, setEditingMattress] = useState(null);
+  const [showEditForm, setShowEditForm] = useState(false);
+
+
   const colors = {
     'Firm': '#2563eb',
     'Medium-Firm': '#4f46e5',
@@ -191,31 +195,53 @@ const MattressComparisonTool = () => {
     setShowAddForm(false);
   };
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white p-4 border rounded shadow">
-          <p className="font-bold mb-2">{data.name}</p>
-          <p>Price: ${data.price.toLocaleString()}</p>
-          <p>Score: {data.score.toFixed(1)}</p>
-          <p>Firmness: {data.firmness}</p>
-          <div className="mt-2 text-sm">
-            <p>Trial: {data.trial} days</p>
-            <p>Warranty: {data.warranty} years</p>
-            <p>Coils: {data.coils}</p>
-            <p>Lumbar Support: {data.lumbar ? 'Yes' : 'No'}</p>
-            <p>Return Cost: ${data.returnCosts}</p>
-            <p>Shipping Cost: ${data.shippingCosts}</p>
-          </div>
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-gray-800 text-white p-4 border rounded shadow">
+        <p className="font-bold mb-2">{data.name}</p>
+        <p>Price: ${data.price.toLocaleString()}</p>
+        <p>Score: {data.score.toFixed(1)}</p>
+        <p>Firmness: {data.firmness}</p>
+        <div className="mt-2 text-sm">
+          <p>Trial: {data.trial} days</p>
+          <p>Warranty: {data.warranty} years</p>
+          <p>Coils: {data.coils}</p>
+          <p>Lumbar Support: {data.lumbar ? 'Yes' : 'No'}</p>
+          <p>Return Cost: ${data.returnCosts}</p>
+          <p>Shipping Cost: ${data.shippingCosts}</p>
         </div>
-      );
-    }
-    return null;
-  };
+      </div>
+    );
+  }
+  return null;
+};
 
   const scoredData = calculateScores();
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+
+  const handleEdit = (mattress) => {
+  setEditingMattress(mattress);
+  setShowEditForm(true);
+  setShowAddForm(false); // Close add form if open
+};
+
+const handleDelete = (id) => {
+  if (confirm('Are you sure you want to delete this mattress?')) {
+    setMattresses(mattresses.filter(m => m.id !== id));
+  }
+};
+
+const handleEditSubmit = (e) => {
+  e.preventDefault();
+  setMattresses(mattresses.map(m => 
+    m.id === editingMattress.id ? editingMattress : m
+  ));
+  setShowEditForm(false);
+  setEditingMattress(null);
+};
+
 
   return (
     <div className="min-h-screen bg-white p-4">
@@ -356,28 +382,159 @@ const MattressComparisonTool = () => {
       )}
 
 <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow overflow-x-auto">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Mattress Comparison</h2>
-        <table className="min-w-full">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="text-left p-3 font-bold text-gray-900">Name</th>
-              <th className="text-right p-3 font-bold text-gray-900">Price</th>
-              <th className="text-right p-3 font-bold text-gray-900">Score</th>
-              <th className="text-left p-3 font-bold text-gray-900">Firmness</th>
-            </tr>
-          </thead>
-          <tbody>
-            {scoredData.sort((a, b) => b.score - a.score).map((item) => (
-              <tr key={item.id} className="border-b border-gray-200">
-                <td className="p-3 text-gray-900">{item.name}</td>
-                <td className="text-right p-3 text-gray-900">${item.price.toLocaleString()}</td>
-                <td className="text-right p-3 text-gray-900">{item.score.toFixed(1)}</td>
-                <td className="p-3 text-gray-900">{item.firmness}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  <h2 className="text-2xl font-bold text-gray-900 mb-4">Mattress Comparison</h2>
+  <table className="min-w-full">
+    <thead>
+      <tr className="bg-gray-100">
+        <th className="text-left p-3 font-bold text-gray-900">Name</th>
+        <th className="text-right p-3 font-bold text-gray-900">Price</th>
+        <th className="text-right p-3 font-bold text-gray-900">Score</th>
+        <th className="text-left p-3 font-bold text-gray-900">Firmness</th>
+        <th className="text-center p-3 font-bold text-gray-900">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {scoredData.sort((a, b) => b.score - a.score).map((item) => (
+        <tr key={item.id} className="border-b border-gray-200">
+          <td className="p-3 text-gray-900">{item.name}</td>
+          <td className="text-right p-3 text-gray-900">${item.price.toLocaleString()}</td>
+          <td className="text-right p-3 text-gray-900">{item.score.toFixed(1)}</td>
+          <td className="p-3 text-gray-900">{item.firmness}</td>
+          <td className="p-3 text-center space-x-2">
+            <button
+              onClick={() => handleEdit(item)}
+              className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => handleDelete(item.id)}
+              className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+{/* Add Edit Form */}
+{showEditForm && editingMattress && (
+  <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
+    <h2 className="text-2xl font-bold text-gray-900 mb-4">Edit Mattress</h2>
+    <form onSubmit={handleEditSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Name</label>
+        <input
+          type="text"
+          value={editingMattress.name}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, name: e.target.value }))}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+        />
       </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Price ($)</label>
+        <input
+          type="number"
+          value={editingMattress.price}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Trial Period (days)</label>
+        <input
+          type="number"
+          value={editingMattress.trial}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, trial: parseInt(e.target.value) || 0 }))}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Warranty (years)</label>
+        <input
+          type="number"
+          value={editingMattress.warranty}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, warranty: parseInt(e.target.value) || 0 }))}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Coil Count</label>
+        <input
+          type="number"
+          value={editingMattress.coils}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, coils: parseInt(e.target.value) || 0 }))}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Firmness</label>
+        <select
+          value={editingMattress.firmness}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, firmness: e.target.value }))}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option value="Firm">Firm</option>
+          <option value="Medium-Firm">Medium-Firm</option>
+          <option value="Medium">Medium</option>
+          <option value="Variable">Variable</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Return Costs ($)</label>
+        <input
+          type="number"
+          value={editingMattress.returnCosts}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, returnCosts: parseFloat(e.target.value) || 0 }))}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Shipping Costs ($)</label>
+        <input
+          type="number"
+          value={editingMattress.shippingCosts}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, shippingCosts: parseFloat(e.target.value) || 0 }))}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        />
+      </div>
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          checked={editingMattress.lumbar}
+          onChange={(e) => setEditingMattress(prev => ({ ...prev, lumbar: e.target.checked }))}
+          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+        />
+        <label className="ml-2 block text-sm text-gray-700">Lumbar Support</label>
+      </div>
+      <div className="col-span-2 space-x-4">
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Save Changes
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowEditForm(false);
+            setEditingMattress(null);
+          }}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+)}
 
       <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Price vs Feature Score Comparison</h2>
