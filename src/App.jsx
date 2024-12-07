@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Label, ResponsiveContainer, Legend } from 'recharts';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const MattressComparisonTool = () => {
   const [mattresses, setMattresses] = useState([
@@ -121,19 +117,6 @@ const MattressComparisonTool = () => {
     returnShipping: 10
   });
 
-  const [newMattress, setNewMattress] = useState({
-    name: '',
-    price: '',
-    trial: '',
-    warranty: '',
-    coils: '',
-    lumbar: false,
-    returnCosts: '',
-    shippingCosts: '',
-    firmness: 'Medium'
-  });
-
-  const firmnessOptions = ['Firm', 'Medium-Firm', 'Medium', 'Variable'];
   const colors = {
     'Firm': '#2563eb',
     'Medium-Firm': '#4f46e5',
@@ -175,38 +158,6 @@ const MattressComparisonTool = () => {
     setWeights(prev => ({ ...prev, [key]: newValue }));
   };
 
-  const handleAddMattress = () => {
-    if (!newMattress.name) return;
-
-    setMattresses(prev => [...prev, {
-      ...newMattress,
-      id: Math.max(0, ...prev.map(m => m.id)) + 1,
-      lumbar: Boolean(newMattress.lumbar),
-      price: parseFloat(newMattress.price) || 0,
-      trial: parseInt(newMattress.trial) || 0,
-      warranty: parseInt(newMattress.warranty) || 0,
-      coils: parseInt(newMattress.coils) || 0,
-      returnCosts: parseFloat(newMattress.returnCosts) || 0,
-      shippingCosts: parseFloat(newMattress.shippingCosts) || 0
-    }]);
-
-    setNewMattress({
-      name: '',
-      price: '',
-      trial: '',
-      warranty: '',
-      coils: '',
-      lumbar: false,
-      returnCosts: '',
-      shippingCosts: '',
-      firmness: 'Medium'
-    });
-  };
-
-  const handleDeleteMattress = (id) => {
-    setMattresses(prev => prev.filter(m => m.id !== id));
-  };
-
   const scoredData = calculateScores();
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
 
@@ -221,11 +172,9 @@ const MattressComparisonTool = () => {
           <p>Firmness: {data.firmness}</p>
           <div className="mt-2">
             <p className="font-bold">Component Scores:</p>
-            <p>Trial: {data.components.trial.toFixed(1)}</p>
-            <p>Warranty: {data.components.warranty.toFixed(1)}</p>
-            <p>Coils: {data.components.coils.toFixed(1)}</p>
-            <p>Lumbar: {data.components.lumbar.toFixed(1)}</p>
-            <p>Shipping/Return: {data.components.costs.toFixed(1)}</p>
+            {Object.entries(data.components).map(([key, value]) => (
+              <p key={key}>{key}: {value.toFixed(1)}</p>
+            ))}
           </div>
         </div>
       );
@@ -234,50 +183,119 @@ const MattressComparisonTool = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Price vs Feature Score Comparison</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-96">
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 20, right: 120, bottom: 60, left: 60 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" dataKey="score" domain={[0, 100]} name="Score">
-                  <Label value="Feature Score" position="bottom" offset={0} />
-                </XAxis>
-                <YAxis type="number" dataKey="price" domain={['dataMin - 100', 'dataMax + 100']} name="Price">
-                  <Label value="Price ($)" angle={-90} position="left" offset={0} />
-                </YAxis>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                {firmnessOptions.map(firmness => (
-                  <Scatter
-                    key={firmness}
-                    name={firmness}
-                    data={scoredData.filter(d => d.firmness === firmness)}
-                    fill={colors[firmness]}
-                  />
-                ))}
-                {scoredData.map((item) => (
-                  <text
-                    key={item.id}
-                    x={item.score + 1}
-                    y={item.price}
-                    dx={5}
-                    dy={4}
-                    fontSize={12}
-                    fill="#666"
-                  >
-                    {item.name}
-                  </text>
-                ))}
-              </ScatterChart>
-            </ResponsiveContainer>
+    <div className="max-w-7xl mx-auto p-4 space-y-8">
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-2xl font-bold mb-4">Scoring Weights (Total: {totalWeight}%)</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {Object.entries(weights).map(([key, value]) => (
+            <div key={key} className="space-y-2">
+              <label className="text-sm font-medium">
+                {key.charAt(0).toUpperCase() + key.slice(1)} Weight (%)
+              </label>
+              <input
+                type="number"
+                value={value}
+                onChange={(e) => handleWeightChange(key, e.target.value)}
+                min="0"
+                max="100"
+                className="w-full p-2 border rounded"
+              />
+            </div>
+          ))}
+        </div>
+        {totalWeight !== 100 && (
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+            Warning: Weights should sum to 100%. Current total: {totalWeight}%
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-2xl font-bold mb-4">Mattress Comparison</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left p-2">Name</th>
+                <th className="text-right p-2">Price</th>
+                <th className="text-right p-2">Score</th>
+                <th className="text-left p-2">Firmness</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scoredData.sort((a, b) => b.score - a.score).map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="p-2">{item.name}</td>
+                  <td className="text-right p-2">${item.price.toLocaleString()}</td>
+                  <td className="text-right p-2">{item.score.toFixed(1)}</td>
+                  <td className="p-2">{item.firmness}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-2xl font-bold mb-4">Price vs Feature Score Comparison</h2>
+        <div className="h-96">
+          <ResponsiveContainer width="100%" height="100%">
+            <ScatterChart
+              margin={{ top: 20, right: 120, bottom: 60, left: 60 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                type="number" 
+                dataKey="score" 
+                domain={[0, 100]}
+                name="Score"
+              >
+                <Label 
+                  value="Feature Score" 
+                  position="bottom" 
+                  offset={0}
+                />
+              </XAxis>
+              <YAxis 
+                type="number" 
+                dataKey="price" 
+                domain={['dataMin - 100', 'dataMax + 100']}
+                name="Price"
+              >
+                <Label 
+                  value="Price ($)" 
+                  angle={-90} 
+                  position="left" 
+                  offset={0}
+                />
+              </YAxis>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              {Object.keys(colors).map(firmness => (
+                <Scatter
+                  key={firmness}
+                  name={firmness}
+                  data={scoredData.filter(d => d.firmness === firmness)}
+                  fill={colors[firmness]}
+                />
+              ))}
+              {scoredData.map((item) => (
+                <text
+                  key={item.id}
+                  x={item.score + 1}
+                  y={item.price}
+                  dx={5}
+                  dy={4}
+                  fontSize={12}
+                  fill="#666"
+                >
+                  {item.name}
+                </text>
+              ))}
+            </ScatterChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 };
