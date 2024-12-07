@@ -463,6 +463,5 @@ const [mattresses, setMattresses] = useState([
       </Card>
     </div>
   );
-};
 
 export default MattressComparisonTool;
